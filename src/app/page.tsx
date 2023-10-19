@@ -1,17 +1,25 @@
-import Link from "next/link";
+import { Editor } from "@/components/editor";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-import { CreatePost } from "@/app/_components/create-post";
-import { getServerAuthSession } from "@/server/auth";
-import { api } from "@/trpc/server";
-import { Button } from "@/components/ui/button";
-
-export default async function Home() {
+const HomePage = () => {
   // const hello = await api.post.hello.query({ text: "from tRPC" });
   // const session = await getServerAuthSession();
 
   return (
-    <div>
-      <Button>Shad</Button>
+    <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1">
+        <header className="flex items-center justify-between bg-zinc-900 p-4 border-b">
+          <h3 className="font-semibold">Random</h3>
+          <Avatar className="w-8 h-8">
+            <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-teal-700" />
+          </Avatar>
+        </header>
+      </div>
+      <div className="flex p-4">
+        <Editor />
+      </div>
     </div>
   );
 }
+
+export default HomePage
