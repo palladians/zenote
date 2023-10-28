@@ -10,31 +10,36 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 
-/**
- * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
- * database instance for multiple projects.
- *
- * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
- */
 export const pgTable = pgTableCreator((name) => `zenote_${name}`);
 
-export const posts = pgTable(
-  "post",
-  {
-    id: uuid("id").primaryKey().unique().defaultRandom(),
-    name: varchar("name", { length: 256 }),
-    createdById: varchar("createdById", { length: 255 }).notNull(),
-    createdAt: timestamp("created_at")
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updatedAt").defaultNow(),
-  },
-  (example) => ({
-    createdByIdIdx: index("createdById_idx").on(example.createdById),
-    nameIndex: index("name_idx").on(example.name),
-  })
-);
+export const hashtags = pgTable('hashtag', {
+  id: uuid("id").primaryKey().unique().defaultRandom(),
+  userId: text("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 64 }).notNull()
+})
+
+export const notes = pgTable('note', {
+  id: uuid("id").primaryKey().unique().defaultRandom(),
+  channelId: uuid("channelId").notNull().references(() => channels.id, { onDelete: "cascade" }),
+  type: text('type', { enum: ['text', 'drawing', 'embed', 'ai'] }).notNull(),
+  content: varchar('1024'),
+  createdAt: timestamp("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow()
+})
+
+export const channels = pgTable('channel', {
+  id: uuid("id").primaryKey().unique().defaultRandom(),
+  name: varchar("name", { length: 64 }).notNull(),
+  userId: text("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow()
+})
 
 export const users = pgTable("user", {
   id: text("id").primaryKey().unique().notNull(),
@@ -43,10 +48,6 @@ export const users = pgTable("user", {
   emailVerified: timestamp("emailVerified").default(sql`CURRENT_TIMESTAMP(3)`),
   image: varchar("image", { length: 255 }),
 });
-
-export const usersRelations = relations(users, ({ many }) => ({
-  accounts: many(accounts),
-}));
 
 export const accounts = pgTable(
   "account",
@@ -71,10 +72,6 @@ export const accounts = pgTable(
   })
 );
 
-export const accountsRelations = relations(accounts, ({ one }) => ({
-  user: one(users, { fields: [accounts.userId], references: [users.id] }),
-}));
-
 export const sessions = pgTable(
   "session",
   {
@@ -89,10 +86,6 @@ export const sessions = pgTable(
   })
 );
 
-export const sessionsRelations = relations(sessions, ({ one }) => ({
-  user: one(users, { fields: [sessions.userId], references: [users.id] }),
-}));
-
 export const verificationTokens = pgTable(
   "verificationToken",
   {
@@ -104,3 +97,55 @@ export const verificationTokens = pgTable(
     compoundKey: primaryKey(vt.identifier, vt.token),
   })
 );
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, { fields: [sessions.userId], references: [users.id] }),
+}));
+
+export const accountsRelations = relations(accounts, ({ one }) => ({
+  user: one(users, { fields: [accounts.userId], references: [users.id] }),
+}));
+
+export const usersRelations = relations(users, ({ many }) => ({
+  channels: many(channels),
+  accounts: many(accounts),
+}))
+
+export const channelsRelations = relations(channels, ({ many, one }) => ({
+  user: one(users, { fields: [channels.userId], references: [users.id] }),
+  notes: many(notes)
+}))
+
+export const notesRelations = relations(notes, ({ many, one }) => ({
+  channel: one(channels, { fields: [notes.channelId], references: [channels.id] }),
+  notesToHashtags: many(notesToHashtags)
+}))
+
+export const hashtagsRelations = relations(hashtags, ({ many, one }) => ({
+  user: one(users, { fields: [hashtags.userId], references: [users.id] }),
+  notesToHashtags: many(notesToHashtags)
+}))
+
+export const notesToHashtags = pgTable('notes_to_hashtags', {
+  noteId: uuid('noteId').notNull().references(() => notes.id),
+  hashtagId: uuid('hashtagId').notNull().references(() => hashtags.id),
+}, (t) => ({
+  pk: primaryKey(t.noteId, t.hashtagId),
+}),
+);
+
+export const notesToHashtagsRelations = relations(notesToHashtags, ({ one }) => ({
+  note: one(notes, {
+    fields: [notesToHashtags.noteId],
+    references: [notes.id]
+  }),
+  hashtag: one(hashtags, {
+    fields: [notesToHashtags.hashtagId],
+    references: [hashtags.id]
+  })
+}))
+
+export const insertChannelSchema = createInsertSchema(channels)
+export const selectChannelSchema = createSelectSchema(channels)
+export const insertNoteSchema = createInsertSchema(notes)
+export const selectNoteSchema = createSelectSchema(notes)

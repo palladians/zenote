@@ -1,10 +1,10 @@
 import "@/app/globals.css";
+import 'focus-visible'
 
 import { Inter } from "next/font/google";
 import { headers } from "next/headers";
 
 import { TRPCReactProvider } from "@/trpc/react";
-import { Sidebar } from "@/components/sidebar";
 import { Providers } from "@/components/providers";
 
 const inter = Inter({
@@ -18,23 +18,22 @@ export const metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-export default function RootLayout({
+const RootLayout = ({
   children,
 }: {
   children: React.ReactNode;
-}) {
+}) => {
   return (
     <html lang="en">
-      <body className={`font-sans ${inter.variable} flex flex-row min-h-screen`}>
+      <body className={`font-sans ${inter.variable} flex flex-row min-h-screen max-h-[100vh]`}>
         <TRPCReactProvider headers={headers()}>
           <Providers>
-            <Sidebar />
-            <main className="flex flex-[3]">
-              {children}
-            </main>
+            {children}
           </Providers>
         </TRPCReactProvider>
       </body>
     </html>
   );
 }
+
+export default RootLayout
