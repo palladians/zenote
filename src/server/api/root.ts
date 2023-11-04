@@ -1,6 +1,9 @@
-import { createTRPCRouter } from "@/server/api/trpc";
-import { channelsRouter } from "./routers/channels";
-import { notesRouter } from "./routers/notes";
+import { createTRPCRouter } from '@/server/api/trpc'
+import { channelsRouter } from './routers/channels'
+import { notesRouter } from './routers/notes'
+import { commentsRouter } from '@/server/api/routers/comments'
+import { bookmarksRouter } from '@/server/api/routers/bookmarks'
+import { usersRouter } from './routers/users'
 
 /**
  * This is the primary router for your server.
@@ -9,8 +12,11 @@ import { notesRouter } from "./routers/notes";
  */
 export const appRouter = createTRPCRouter({
   channels: channelsRouter,
-  notes: notesRouter
-});
+  notes: notesRouter,
+  comments: commentsRouter,
+  bookmarks: bookmarksRouter,
+  users: usersRouter
+})
 
 // export type definition of API
-export type AppRouter = typeof appRouter;
+export type AppRouter = typeof appRouter

@@ -6,8 +6,8 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog'
 
 export type ConfirmationDialogProps = {
   open: boolean
@@ -17,7 +17,13 @@ export type ConfirmationDialogProps = {
   description: string
 }
 
-export const ConfirmationDialog = ({ title, description, onConfirm, open, setOpen }: ConfirmationDialogProps) => {
+export const ConfirmationDialog = ({
+  title,
+  description,
+  onConfirm,
+  open,
+  setOpen
+}: ConfirmationDialogProps) => {
   const confirmAction = async () => {
     await onConfirm()
     setOpen(false)
@@ -31,7 +37,9 @@ export const ConfirmationDialog = ({ title, description, onConfirm, open, setOpe
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={confirmAction}>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={confirmAction}>
+            Continue
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

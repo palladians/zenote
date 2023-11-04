@@ -1,19 +1,25 @@
-import { create } from "zustand";
+import { create } from 'zustand'
 
 type AppState = {
   extendedEditorOpen: boolean
   editingNoteId: string | null
   deletingChannelId: string | null
   deletingNoteId: string | null
-  quickNoteValue: string
+  dueDateNoteId: string | null
+  noteValue: string
+  notesSearchOpen: boolean
 }
 
 type AppActions = {
   setExtendedEditorOpen: (open: boolean) => void
   setEditingNoteId: (editingNoteId: AppState['editingNoteId']) => void
-  setDeletingChannelId: (deletingChannelId: AppState['deletingChannelId']) => void
+  setDeletingChannelId: (
+    deletingChannelId: AppState['deletingChannelId']
+  ) => void
   setDeletingNoteId: (deletingNoteId: AppState['deletingNoteId']) => void
-  setQuickNoteValue: (quickNoteValue: string) => void
+  setDueDateNoteId: (deletingNoteId: AppState['dueDateNoteId']) => void
+  setNoteValue: (quickNoteValue: string) => void
+  setNotesSearchOpen: (notesSearchOpen: boolean) => void
 }
 
 export type AppStore = AppState & AppActions
@@ -23,7 +29,9 @@ export const useAppStore = create<AppStore>((set) => ({
   editingNoteId: null,
   deletingChannelId: null,
   deletingNoteId: null,
-  quickNoteValue: '',
+  noteValue: '',
+  notesSearchOpen: false,
+  dueDateNoteId: null,
   setExtendedEditorOpen(open) {
     return set(() => ({ extendedEditorOpen: open }))
   },
@@ -36,7 +44,13 @@ export const useAppStore = create<AppStore>((set) => ({
   setDeletingNoteId(deletingNoteId) {
     return set(() => ({ deletingNoteId }))
   },
-  setQuickNoteValue(quickNoteValue) {
-    return set(() => ({ quickNoteValue }))
+  setNoteValue(noteValue) {
+    return set(() => ({ noteValue }))
+  },
+  setNotesSearchOpen(notesSearchOpen) {
+    return set(() => ({ notesSearchOpen }))
+  },
+  setDueDateNoteId(dueDateNoteId) {
+    return set(() => ({ dueDateNoteId }))
   }
 }))

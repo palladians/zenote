@@ -1,13 +1,9 @@
-import { DrawingEdit } from "@/components/drawing/edit"
-import { api } from "@/trpc/server"
-import { match } from "ts-pattern"
+import { FullEditorForm } from '@/components/notes-update/full-editor-form'
+import { api } from '@/trpc/server'
 
 const NotePage = async ({ params }: { params: { noteId: string } }) => {
   const note = await api.notes.get.query({ id: params.noteId })
-  console.log('>>>N', note)
-  return (
-    match(note).with({ type: 'drawing' }, (note) => <DrawingEdit note={note} />).otherwise(() => null)
-  )
+  return <FullEditorForm note={note} />
 }
 
 export default NotePage
