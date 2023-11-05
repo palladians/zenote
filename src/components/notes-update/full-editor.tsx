@@ -1,7 +1,7 @@
 'use client'
 
 import '@/components/notes/editor.css'
-import { Editor, EditorContent } from '@tiptap/react'
+import { type Editor, EditorContent } from '@tiptap/react'
 import { Button } from '@/components/ui/button'
 import { BrushIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'

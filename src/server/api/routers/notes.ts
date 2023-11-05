@@ -11,11 +11,14 @@ import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 
 export const notesRouter = createTRPCRouter({
-  index: protectedProcedure
-    .query(({ ctx }) =>
-      ctx.db.query.notes
-        .findMany({ where: and(isNotNull(notes.dueDate), eq(notes.userId, ctx.session.user.id)) })
-    ),
+  index: protectedProcedure.query(({ ctx }) =>
+    ctx.db.query.notes.findMany({
+      where: and(
+        isNotNull(notes.dueDate),
+        eq(notes.userId, ctx.session.user.id)
+      )
+    })
+  ),
   search: protectedProcedure
     .input(z.object({ query: z.string().min(1) }))
     .query(async ({ ctx, input }) => {

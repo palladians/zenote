@@ -8,11 +8,16 @@ import {
   text,
   timestamp,
   varchar,
-  boolean,
+  boolean
 } from 'drizzle-orm/pg-core'
 import { type AdapterAccount } from 'next-auth/adapters'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
-import { adjectives, animals, colors, uniqueNamesGenerator } from 'unique-names-generator'
+import {
+  adjectives,
+  animals,
+  colors,
+  uniqueNamesGenerator
+} from 'unique-names-generator'
 
 export const pgTable = pgTableCreator((name) => `zenote_${name}`)
 
@@ -104,7 +109,12 @@ export const channelMemberships = pgTable('channel_membership', {
 export const users = pgTable('user', {
   id: text('id').primaryKey().unique().notNull(),
   name: varchar('name', { length: 255 }),
-  username: varchar('username', { length: 255 }).default(uniqueNamesGenerator({ dictionaries: [adjectives, colors, animals] })).notNull().unique(),
+  username: varchar('username', { length: 255 })
+    .default(
+      uniqueNamesGenerator({ dictionaries: [adjectives, colors, animals] })
+    )
+    .notNull()
+    .unique(),
   stripeId: varchar('stripeId', { length: 255 }),
   subscriptionTier: varchar('subscriptionTier', {
     length: 255,

@@ -4,9 +4,10 @@ import {
   channelMemberships,
   channels,
   insertChannelSchema,
+  notes,
   selectChannelSchema
 } from '@/server/db/schema'
-import { and, eq } from 'drizzle-orm'
+import { and, asc, eq } from 'drizzle-orm'
 import { TRPCError } from '@trpc/server'
 
 export const channelsRouter = createTRPCRouter({
@@ -35,7 +36,8 @@ export const channelsRouter = createTRPCRouter({
                   with: {
                     user: true,
                     noteBookmarks: true
-                  }
+                  },
+                  orderBy: [asc(notes.createdAt)]
                 }
               }
             }

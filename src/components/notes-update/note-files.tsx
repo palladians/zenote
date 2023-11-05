@@ -1,9 +1,9 @@
-import { Badge } from "../ui/badge"
+import { Badge } from '../ui/badge'
 
 export const NoteFiles = () => {
   return (
     <div className="flex flex-col">
-      <div className="flex justify-between items-center border-b border-t py-2 px-4">
+      <div className="flex items-center justify-between border-b border-t px-4 py-2">
         <h2 className="text-lg font-semibold">Files</h2>
       </div>
       <div className="p-4">

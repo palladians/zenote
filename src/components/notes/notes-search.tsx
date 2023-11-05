@@ -23,8 +23,6 @@ export const NotesSearch = () => {
   const notesSearchOpen = useAppStore((state) => state.notesSearchOpen)
   const setNotesSearchOpen = useAppStore((state) => state.setNotesSearchOpen)
 
-  console.log('>>>Q', query, data)
-
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {

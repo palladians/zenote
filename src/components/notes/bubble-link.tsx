@@ -1,8 +1,8 @@
-import { CheckIcon, ChevronLeftIcon } from "lucide-react"
-import { Button } from "../ui/button"
-import { Input } from "../ui/input"
-import { MenuStep, PanelProps } from "./editor-bubble-menu"
-import { SubmitHandler, useForm } from "react-hook-form"
+import { CheckIcon, ChevronLeftIcon } from 'lucide-react'
+import { Button } from '../ui/button'
+import { Input } from '../ui/input'
+import { MenuStep, type PanelProps } from './editor-bubble-menu'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 
 type LinkForm = {
   link: string
@@ -19,8 +19,15 @@ export const BubbleLink = ({ editor, setMenuStep }: PanelProps) => {
     setMenuStep(MenuStep.START)
   }
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex p-1 items-center justify-center gap-1">
-      <Button variant="ghost" size="sm" onClick={() => setMenuStep(MenuStep.START)}>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex items-center justify-center gap-1 p-1"
+    >
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setMenuStep(MenuStep.START)}
+      >
         <ChevronLeftIcon size={16} />
       </Button>
       <Input placeholder="Paste a link" className="h-8" {...register('link')} />

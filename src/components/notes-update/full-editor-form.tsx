@@ -1,7 +1,7 @@
 'use client'
 
 import { api } from '@/trpc/react'
-import { NoteProps } from '@/lib/types'
+import { type NoteProps } from '@/lib/types'
 import { useParams, useSearchParams } from 'next/navigation'
 import { FullEditor } from '@/components/notes-update/full-editor'
 import { useRouter } from 'next/navigation'

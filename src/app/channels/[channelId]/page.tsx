@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { api } from '@/trpc/server'
 import { NotesList } from '@/components/channels/notes-list'
 import { QuickEditorForm } from '@/components/notes-create/quick-editor-form'
+import { ChannelMenu } from '@/components/channels/channel-menu'
 
 const ChannelPage = async ({ params }: { params: { channelId: string } }) => {
   const { channel, notes } = await api.channels.get.query({
@@ -12,7 +13,12 @@ const ChannelPage = async ({ params }: { params: { channelId: string } }) => {
   return (
     <div className="flex flex-1 flex-col">
       <Navbar
-        title={channel.name}
+        title={
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold">{channel.name}</h3>
+            <ChannelMenu channel={channel} hidding={false} />
+          </div>
+        }
         addon={
           <Button size="sm" variant="secondary">
             Share

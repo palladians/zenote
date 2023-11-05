@@ -15,6 +15,6 @@ export const config = {
       inline: true,
       allowBase64: true
     }),
-    EditorTldraw,
+    EditorTldraw
   ]
 }

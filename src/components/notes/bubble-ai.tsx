@@ -1,8 +1,8 @@
-import { useCompletion } from "ai/react"
-import { MenuStep, PanelProps } from "./editor-bubble-menu"
-import { Editor } from "@tiptap/core"
-import { Button } from "../ui/button"
-import { ChevronLeftIcon, PlayIcon } from "lucide-react"
+import { useCompletion } from 'ai/react'
+import { MenuStep, type PanelProps } from './editor-bubble-menu'
+import { type Editor } from '@tiptap/core'
+import { Button } from '../ui/button'
+import { ChevronLeftIcon, PlayIcon } from 'lucide-react'
 
 const AI_CONTEXT = `
   You are Zenote AI, personal notes autocompletion.

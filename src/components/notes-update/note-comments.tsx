@@ -5,9 +5,9 @@ import { PlusIcon, SendIcon, XIcon } from 'lucide-react'
 import { UserAvatar } from '../users/user-avatar'
 import { useState } from 'react'
 import { Textarea } from '../ui/textarea'
-import { NoteProps } from '@/lib/types'
+import { type NoteProps } from '@/lib/types'
 import { format } from 'date-fns'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import { api } from '@/trpc/react'
 import { useSession } from 'next-auth/react'
 import { useParams, useRouter } from 'next/navigation'
@@ -20,18 +20,16 @@ type CommentProps = {
   userName: string
 }
 
-const Comment = ({ id,
-  content,
-  createdAt,
-  userName
-}: CommentProps) => {
+const Comment = ({ id, content, createdAt, userName }: CommentProps) => {
   return (
     <div className="flex items-start gap-4">
       <UserAvatar />
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
           <p className="text-sm">{userName}</p>
-          <p className="text-muted-foreground text-sm">{createdAt && format(createdAt, 'DDD')}</p>
+          <p className="text-sm text-muted-foreground">
+            {createdAt && format(createdAt, 'PP p')}
+          </p>
         </div>
         <p className="text-muted-foreground">{content}</p>
         <div className="flex gap-4">
@@ -97,12 +95,23 @@ const CommentList = ({ note }: { note: NoteProps }) => {
   return (
     <div className="flex flex-col gap-4 p-4">
       {note.comments?.map((comment) => (
-        <Comment key={comment.id} content={comment.content ?? ''} createdAt={comment.createdAt} id={comment.id ?? ''} userName={comment.user?.name ?? ''} />
+        <Comment
+          key={comment.id}
+          content={comment.content ?? ''}
+          createdAt={comment.createdAt}
+          id={comment.id ?? ''}
+          userName={comment.user?.name ?? ''}
+        />
       ))}
       {addingComment ? (
         <AddCommentForm hideForm={() => setAddingComment(false)} />
       ) : (
-        <Button variant="secondary" size="sm" className="gap-2" onClick={() => setAddingComment(true)}>
+        <Button
+          variant="secondary"
+          size="sm"
+          className="gap-2"
+          onClick={() => setAddingComment(true)}
+        >
           <PlusIcon size={16} />
           <span>Add Comment</span>
         </Button>

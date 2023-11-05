@@ -4,6 +4,7 @@ import { getServerAuthSession } from '@/server/auth'
 import { redirect } from 'next/navigation'
 import { NoteDeleteDialog } from '@/components/notes/note-delete-dialog'
 import { NoteDueDateDialog } from '@/components/notes/note-due-date-dialog'
+import { ChannelDeleteDialog } from '../channels/channel-delete-dialog'
 
 export const DashboardLayout = async ({
   children
@@ -18,6 +19,7 @@ export const DashboardLayout = async ({
       <NotesSearch />
       <NoteDeleteDialog />
       <NoteDueDateDialog />
+      <ChannelDeleteDialog />
       <main className="flex flex-[3]">{children}</main>
     </>
   )

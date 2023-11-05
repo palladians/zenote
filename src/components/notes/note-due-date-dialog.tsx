@@ -21,8 +21,9 @@ import { Calendar } from '@/components/ui/calendar'
 import { useAppStore } from '@/store/app'
 import React from 'react'
 import { Input } from '@/components/ui/input'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import { api } from '@/trpc/react'
+import { useRouter } from 'next/navigation'
 
 export type NoteDueDateDialogProps = {
   open: boolean
@@ -35,25 +36,30 @@ type DueDateForm = {
 }
 
 export const NoteDueDateDialog = () => {
+  const router = useRouter()
   const dueDateNoteId = useAppStore((state) => state.dueDateNoteId)
   const { data: note } = api.notes.get.useQuery({ id: dueDateNoteId ?? '' })
   const { mutateAsync: updateNote } = api.notes.update.useMutation()
   const setDueDateNoteId = useAppStore((state) => state.setDueDateNoteId)
   const { register, watch, handleSubmit, setValue } = useForm<DueDateForm>({
     defaultValues: {
-      date: undefined,
+      date: new Date(),
       time: ''
     }
   })
   const onSubmit: SubmitHandler<DueDateForm> = async (data) => {
     if (!note) return
     const [hours, minutes] = data.time.split(':')
-    const dueDate = set(data.date, {hours: parseInt(hours ?? '0'), minutes: parseInt(minutes ?? '0')})
+    const dueDate = set(data.date, {
+      hours: parseInt(hours ?? '0'),
+      minutes: parseInt(minutes ?? '0')
+    })
     await updateNote({
       ...note,
       dueDate
     })
     setDueDateNoteId(null)
+    router.refresh()
   }
   const date = watch('date')
   return (
@@ -79,7 +85,7 @@ export const NoteDueDateDialog = () => {
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, 'PPP') : <span>Pick a date</span>}
+                  {date ? format(date, 'PP') : <span>Pick a date</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">

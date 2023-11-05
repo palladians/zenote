@@ -5,14 +5,12 @@ import { type Editor, Extension } from '@tiptap/core'
 import { EditorContent, useEditor } from '@tiptap/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { StarsIcon } from 'lucide-react'
 import { useAppStore } from '@/store/app'
 import { cn } from '@/lib/utils'
 import { config } from '@/components/notes/editor-config'
 import Placeholder from '@tiptap/extension-placeholder'
-import { useChat } from 'ai/react'
-import { type FormEvent, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { EditorBubbleMenu } from '@/components/notes/editor-bubble-menu'
 
 export type OnSaveHandler = ({ content }: { content: string }) => Promise<void>
@@ -23,16 +21,7 @@ export type QuickEditorProps = {
 
 export const QuickEditor = ({ onSave }: QuickEditorProps) => {
   const router = useRouter()
-  const { channelId } = useParams()
   const noteValue = useAppStore((state) => state.noteValue)
-  console.log('>>>INNERV', noteValue)
-  const { handleSubmit, setInput } = useChat({
-    api: '/api/chat',
-    initialInput: noteValue,
-    body: {
-      channelId
-    }
-  })
   const handleSave = async ({ editor }: { editor: Editor }) => {
     if (editor.getText().length === 0) return
     const content = JSON.stringify(editor.getJSON())
@@ -71,11 +60,6 @@ export const QuickEditor = ({ onSave }: QuickEditorProps) => {
   }, [noteValue, editor])
   if (!editor) return null
   const editorHasValue = editor.getText().length > 0
-  const sendOpenAiPrompt = (e: FormEvent<HTMLFormElement>) => {
-    setInput(`${noteValue} - send response in HTML <p> wrapped paragraphs.`)
-    console.log('NV', noteValue)
-    handleSubmit(e)
-  }
   return (
     <>
       {editor && <EditorBubbleMenu editor={editor} />}
@@ -86,14 +70,6 @@ export const QuickEditor = ({ onSave }: QuickEditorProps) => {
         )}
       >
         <div className="absolute bottom-3 right-2 z-10 flex items-center gap-2">
-          {editorHasValue && (
-            <form onSubmit={sendOpenAiPrompt}>
-              <Button type="submit" variant="secondary" className="gap-2">
-                <StarsIcon size={16} />
-                <span>Ask AI</span>
-              </Button>
-            </form>
-          )}
           {editorHasValue && (
             <Button className="gap-2" onClick={() => handleSave({ editor })}>
               <span>Save</span>

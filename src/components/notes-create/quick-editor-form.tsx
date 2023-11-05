@@ -21,7 +21,7 @@ export const QuickEditorForm = ({ saveCallback }: EditorFormProps) => {
     await createNote({
       content,
       type: 'text' as never,
-      channelId: String(channelId),
+      channelId: String(channelId)
     })
     saveCallback && saveCallback()
   }
@@ -29,7 +29,7 @@ export const QuickEditorForm = ({ saveCallback }: EditorFormProps) => {
     const note = await createNote({
       content: '',
       type: 'text' as never,
-      channelId: String(channelId),
+      channelId: String(channelId)
     })
     router.refresh()
     router.push(`/notes/${note[0]?.id}`)

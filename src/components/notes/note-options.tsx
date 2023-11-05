@@ -1,6 +1,6 @@
 'use client'
 
-import { NoteProps } from '@/lib/types'
+import { type NoteProps } from '@/lib/types'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,12 +9,7 @@ import {
   DropdownMenuTrigger
 } from '../ui/dropdown-menu'
 import { Button } from '../ui/button'
-import {
-  LockIcon,
-  MoreVerticalIcon,
-  ShareIcon,
-  TrashIcon
-} from 'lucide-react'
+import { LockIcon, MoreVerticalIcon, ShareIcon, TrashIcon } from 'lucide-react'
 import { useAppStore } from '@/store/app'
 
 export type NoteOptionsProps = {

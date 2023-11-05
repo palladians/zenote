@@ -6,6 +6,7 @@ import { headers } from 'next/headers'
 
 import { TRPCReactProvider } from '@/trpc/react'
 import { Providers } from '@/components/providers'
+import { Toaster } from '@/components/ui/toaster'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -27,6 +28,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <TRPCReactProvider headers={headers()}>
           <Providers>{children}</Providers>
         </TRPCReactProvider>
+        <Toaster />
       </body>
     </html>
   )

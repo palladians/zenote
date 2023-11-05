@@ -1,5 +1,5 @@
-import { createEnv } from "@t3-oss/env-nextjs";
-import { z } from "zod";
+import { createEnv } from '@t3-oss/env-nextjs'
+import { z } from 'zod'
 
 export const env = createEnv({
   server: {
@@ -7,14 +7,14 @@ export const env = createEnv({
       .string()
       .url()
       .refine(
-        (str) => !str.includes("YOUR_POSTGRES_URL_HERE"),
-        "You forgot to change the default URL"
+        (str) => !str.includes('YOUR_POSTGRES_URL_HERE'),
+        'You forgot to change the default URL'
       ),
     NODE_ENV: z
-      .enum(["development", "test", "production"])
-      .default("development"),
+      .enum(['development', 'test', 'production'])
+      .default('development'),
     NEXTAUTH_SECRET:
-      process.env.NODE_ENV === "production"
+      process.env.NODE_ENV === 'production'
         ? z.string()
         : z.string().optional(),
     NEXTAUTH_URL: z.preprocess(
@@ -31,11 +31,14 @@ export const env = createEnv({
     EMAIL_FROM: z.string(),
     OPENAI_API_KEY: z.string(),
     OPENAI_BASE_URL: z.string(),
-    OPENAI_MODEL: z.string()
+    OPENAI_MODEL: z.string(),
+    STRIPE_SECRET_KEY: z.string().optional(),
+    STRIPE_WEBHOOK_SECRET: z.string().optional(),
+    ZENOTE_SELF_HOSTED: z.coerce.boolean().default(false)
   },
 
   client: {
-    // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional()
   },
 
   runtimeEnv: {
@@ -50,8 +53,13 @@ export const env = createEnv({
     EMAIL_FROM: process.env.EMAIL_FROM,
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     OPENAI_BASE_URL: process.env.OPENAI_BASE_URL,
-    OPENAI_MODEL: process.env.OPENAI_MODEL
+    OPENAI_MODEL: process.env.OPENAI_MODEL,
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:
+      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+    ZENOTE_SELF_HOSTED: process.env.ZENOTE_SELF_HOSTED
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
-  emptyStringAsUndefined: true,
-});
+  emptyStringAsUndefined: true
+})

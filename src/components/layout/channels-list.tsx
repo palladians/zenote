@@ -1,14 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import {
-  PlusIcon,
-  CircleIcon,
-  CircleDotIcon,
-  Edit2Icon,
-  TrashIcon,
-  MoreVerticalIcon
-} from 'lucide-react'
+import { PlusIcon, CircleIcon, CircleDotIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { api } from '@/trpc/react'
@@ -18,16 +11,11 @@ import { insertChannelSchema } from '@/server/db/schema'
 import NextLink from 'next/link'
 import { type z } from 'zod'
 import { useSession } from 'next-auth/react'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
 import { ConfirmationDialog } from '@/components/confirmation-dialog'
 import { useParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useAppStore } from '@/store/app'
+import { ChannelMenu } from '../channels/channel-menu'
 
 type CreateChannelFormProps = {
   onBlur: () => void
@@ -70,24 +58,12 @@ export const ChannelsList = () => {
   const setDeletingChannelId = useAppStore(
     (state) => state.setDeletingChannelId
   )
-  const onCreated = () => {
+  const onCreated = async () => {
     setCreatingChannel(false)
-    refetch()
+    await refetch()
   }
   return (
     <>
-      <ConfirmationDialog
-        title="Are you absolutely sure?"
-        description="This action will delete this channel and all its notes."
-        onConfirm={async () => {
-          await deleteChannel({ id: deletingChannelId || '' })
-          refetch()
-        }}
-        open={!!deletingChannelId}
-        setOpen={(nextValue) =>
-          nextValue === false && setDeletingChannelId(null)
-        }
-      />
       <div className="flex flex-col gap-1 border-b px-4 py-2">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold">Channels</h2>
@@ -132,30 +108,7 @@ export const ChannelsList = () => {
                   <span>{channel.name}</span>
                 </NextLink>
               </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="opacity-0 transition-opacity group-hover:opacity-100"
-                  >
-                    <MoreVerticalIcon size={16} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom">
-                  <DropdownMenuItem className='gap-2'>
-                    <Edit2Icon size={16} />
-                    <span>Edit</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer text-red-700 dark:text-red-500 gap-2"
-                    onClick={() => setDeletingChannelId(channel.id)}
-                  >
-                    <TrashIcon size={16} />
-                    <span>Delete</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <ChannelMenu channel={channel} />
             </div>
           )
         })}

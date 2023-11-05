@@ -9,7 +9,14 @@ const HomePage = async () => {
   const bookmarkedNotes = await api.bookmarks.index.query()
   return (
     <div className="flex flex-1 flex-col gap-8">
-      <Navbar title="Dashboard" addon={<Button size="sm" variant="secondary"><BellIcon size={16} /></Button>} />
+      <Navbar
+        title="Dashboard"
+        addon={
+          <Button size="sm" variant="secondary">
+            <BellIcon size={16} />
+          </Button>
+        }
+      />
       <div className="container flex flex-col gap-4">
         <h2 className="text-2xl font-semibold">FlowBox</h2>
         <div className="grid grid-cols-2 gap-4">

@@ -1,6 +1,6 @@
-import { LinkIcon } from "lucide-react"
-import { Button } from "../ui/button"
-import { MenuStep, PanelProps } from "./editor-bubble-menu"
+import { LinkIcon } from 'lucide-react'
+import { Button } from '../ui/button'
+import { MenuStep, type PanelProps } from './editor-bubble-menu'
 
 export const BubbleStart = ({ editor, setMenuStep }: PanelProps) => {
   return (
@@ -62,10 +62,7 @@ export const BubbleStart = ({ editor, setMenuStep }: PanelProps) => {
       >
         1.
       </Button>
-      <Button
-        variant="ghost"
-        onClick={() => setMenuStep(MenuStep.AI)}
-      >
+      <Button variant="ghost" onClick={() => setMenuStep(MenuStep.AI)}>
         AI
       </Button>
     </div>
