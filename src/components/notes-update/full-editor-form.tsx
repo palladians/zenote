@@ -9,6 +9,7 @@ import { NoteComments } from './note-comments'
 import { NoteFiles } from './note-files'
 import { NoteMenu } from './note-menu'
 import { useFullEditor } from './use-full-editor'
+import { type Content } from '@tiptap/core'
 
 export type EditorUpdateNoteProps = {
   note: NoteProps
@@ -26,7 +27,7 @@ export const FullEditorForm = ({ note }: EditorUpdateNoteProps) => {
       content
     })
   }
-  const defaultValue = JSON.parse(String(note.content || '{}'))
+  const defaultValue = JSON.parse(String(note.content ?? '{}')) as Content
   const editor = useFullEditor({ defaultValue })
   const sidebarOpen = searchParams.get('sidebar') === 'true'
   const toggleSidebar = () =>

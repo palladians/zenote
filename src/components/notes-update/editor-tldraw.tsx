@@ -1,6 +1,13 @@
 import { Node, type NodeViewProps, mergeAttributes } from '@tiptap/core'
 import { NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react'
-import { Tldraw, track, createTLStore, defaultShapeUtils } from '@tldraw/tldraw'
+import {
+  Tldraw,
+  track,
+  createTLStore,
+  defaultShapeUtils,
+  type StoreSnapshot,
+  type TLRecord
+} from '@tldraw/tldraw'
 import '@tldraw/tldraw/tldraw.css'
 import { useEffect, useState } from 'react'
 import { debounce } from 'throttle-debounce'
@@ -29,17 +36,18 @@ const DrawingComponent = track(({ updateAttributes, node }: NodeViewProps) => {
   useEffect(() => {
     if (!store) return
     store.listen(debouncedCanvasUpdate)
-  }, [store])
+  }, [debouncedCanvasUpdate, store])
   useEffect(() => {
     if (restored) return
-    const stringifiedSnapshot = node.attrs.state
+    const stringifiedSnapshot = node.attrs.state as string
     if (!stringifiedSnapshot) return
     const snapshot =
-      stringifiedSnapshot?.length > 0 && JSON.parse(stringifiedSnapshot)
+      stringifiedSnapshot?.length > 0 &&
+      (JSON.parse(stringifiedSnapshot) as StoreSnapshot<TLRecord>)
     if (!snapshot) return
     store.loadSnapshot(snapshot)
     setRestored(true)
-  }, [node.attrs])
+  }, [node.attrs, restored, store])
   return (
     <NodeViewWrapper data-drawing>
       <AspectRatio ratio={2}>

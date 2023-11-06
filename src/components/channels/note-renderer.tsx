@@ -27,6 +27,7 @@ import { useRouter } from 'next/navigation'
 import { type NoteProps } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { useAppStore } from '@/store/app'
+import { type JSONContent } from '@tiptap/core'
 
 export const NoteRenderer = ({
   note,
@@ -37,7 +38,10 @@ export const NoteRenderer = ({
 }) => {
   const router = useRouter()
   const json = useMemo(() => JSON.parse(note.content ?? '{}'), [note.content])
-  const output = useMemo(() => generateHTML(json, config.extensions), [json])
+  const output = useMemo(
+    () => generateHTML(json as JSONContent, config.extensions),
+    [json]
+  )
   const setDueDateNoteId = useAppStore((state) => state.setDueDateNoteId)
   const { data } = useSession()
   const { mutateAsync: toggleBookmark } = api.bookmarks.toggle.useMutation()

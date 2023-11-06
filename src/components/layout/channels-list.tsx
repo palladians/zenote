@@ -11,10 +11,8 @@ import { insertChannelSchema } from '@/server/db/schema'
 import NextLink from 'next/link'
 import { type z } from 'zod'
 import { useSession } from 'next-auth/react'
-import { ConfirmationDialog } from '@/components/confirmation-dialog'
 import { useParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { useAppStore } from '@/store/app'
 import { ChannelMenu } from '../channels/channel-menu'
 
 type CreateChannelFormProps = {
@@ -53,11 +51,6 @@ export const ChannelsList = () => {
   const { channelId } = useParams()
   const [creatingChannel, setCreatingChannel] = useState<boolean>(false)
   const { data: channelList, refetch } = api.channels.index.useQuery()
-  const { mutateAsync: deleteChannel } = api.channels.delete.useMutation()
-  const deletingChannelId = useAppStore((state) => state.deletingChannelId)
-  const setDeletingChannelId = useAppStore(
-    (state) => state.setDeletingChannelId
-  )
   const onCreated = async () => {
     setCreatingChannel(false)
     await refetch()

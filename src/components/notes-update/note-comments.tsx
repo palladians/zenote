@@ -20,7 +20,7 @@ type CommentProps = {
   userName: string
 }
 
-const Comment = ({ id, content, createdAt, userName }: CommentProps) => {
+const Comment = ({ content, createdAt, userName }: CommentProps) => {
   return (
     <div className="flex items-start gap-4">
       <UserAvatar />

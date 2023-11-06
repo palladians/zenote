@@ -11,15 +11,15 @@ import {
   CommandItem,
   CommandList
 } from '@/components/ui/command'
-import { api } from '@/trpc/react'
+// import { api } from '@/trpc/react'
 import { useAppStore } from '@/store/app'
 
 export const NotesSearch = () => {
   const [query, setQuery] = React.useState<string>('')
-  const { data } = api.notes.search.useQuery(
-    { query },
-    { enabled: query.length > 0 }
-  )
+  // const { data } = api.notes.search.useQuery(
+  // { query },
+  // { enabled: query.length > 0 }
+  // )
   const notesSearchOpen = useAppStore((state) => state.notesSearchOpen)
   const setNotesSearchOpen = useAppStore((state) => state.setNotesSearchOpen)
 
@@ -33,7 +33,7 @@ export const NotesSearch = () => {
 
     document.addEventListener('keydown', down)
     return () => document.removeEventListener('keydown', down)
-  }, [])
+  }, [notesSearchOpen, setNotesSearchOpen])
 
   return (
     <CommandDialog open={notesSearchOpen} onOpenChange={setNotesSearchOpen}>

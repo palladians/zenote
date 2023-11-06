@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger
 } from '../ui/dropdown-menu'
 import { useAppStore } from '@/store/app'
-import { ChannelProps } from '@/lib/types'
+import { type ChannelProps } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 

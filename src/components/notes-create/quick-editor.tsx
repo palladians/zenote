@@ -37,8 +37,8 @@ export const QuickEditor = ({ onSave }: QuickEditorProps) => {
         name: 'shortcuts',
         addKeyboardShortcuts() {
           return {
-            'Cmd-Enter': handleSave
-          } as any
+            'Cmd-Enter': handleSave as never
+          }
         }
       }),
       Placeholder.configure({
@@ -56,7 +56,7 @@ export const QuickEditor = ({ onSave }: QuickEditorProps) => {
   useEffect(() => {
     if (!noteValue || !editor) return
     const docContent = noteValue && JSON.parse(noteValue)
-    editor.commands.setContent(docContent)
+    if (docContent) editor.commands.setContent(docContent)
   }, [noteValue, editor])
   if (!editor) return null
   const editorHasValue = editor.getText().length > 0

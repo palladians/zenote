@@ -1,4 +1,4 @@
-export const fetcher = async <JSON = any>(
+export const fetcher = async <JSON = never>(
   input: RequestInfo,
   init?: RequestInit
 ): Promise<JSON> => {

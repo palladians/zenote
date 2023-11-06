@@ -2,8 +2,6 @@
 
 import '@/components/notes/editor.css'
 import { type Editor, EditorContent } from '@tiptap/react'
-import { Button } from '@/components/ui/button'
-import { BrushIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EditorBubbleMenu } from '@/components/notes/editor-bubble-menu'
 import { debounce } from 'throttle-debounce'
@@ -21,8 +19,8 @@ export const FullEditor = ({ editor, onSave }: EditorCoreProps) => {
   const content = editor?.state.doc.content
   useEffect(() => {
     if (!editor) return
-    debouncedOnSave({ content: JSON.stringify(editor?.getJSON()) })
-  }, [content])
+    void debouncedOnSave({ content: JSON.stringify(editor?.getJSON()) })
+  }, [content, debouncedOnSave, editor])
   if (!editor) return null
   return (
     <>

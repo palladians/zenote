@@ -2,33 +2,37 @@ import { DrizzleAdapter } from '@auth/drizzle-adapter'
 import {
   getServerSession,
   type DefaultSession,
-  type NextAuthOptions
+  type NextAuthOptions,
+  type DefaultUser
 } from 'next-auth'
 import EmailProvider from 'next-auth/providers/email'
 
 import { env } from '@/env.mjs'
 import { db } from '@/server/db'
-import { pgTable } from '@/server/db/schema'
+import { pgTable, users } from '@/server/db/schema'
+import { eq } from 'drizzle-orm'
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
  * object and keep type safety.
  *
- * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
+ * @see https://next-auth.js.org/getting-started/typescrzipt#module-augmentation
  */
 declare module 'next-auth' {
   interface Session extends DefaultSession {
     user: {
       id: string
-      // ...other properties
-      // role: UserRole;
+      username?: string
+      stripeId?: string
+      subscriptionTier?: 'none' | 'standard' | 'lifetime'
     } & DefaultSession['user']
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User extends DefaultUser {
+    username?: string
+    stripeId?: string
+    subscriptionTier?: 'none' | 'standard' | 'lifetime'
+  }
 }
 
 /**
@@ -38,10 +42,26 @@ declare module 'next-auth' {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
+    async jwt({ user, token }) {
+      const dbUser = await db.query.users.findFirst({
+        where: eq(users.id, user.id)
+      })
+      if (!dbUser) return token
+      return {
+        id: dbUser.id,
+        name: dbUser.name,
+        username: dbUser.username,
+        email: dbUser.email,
+        stripeId: dbUser.stripeId,
+        subscriptionTier: dbUser.subscriptionTier
+      }
+    },
     session: ({ session, user }) => ({
       ...session,
       user: {
         ...session.user,
+        stripeId: user.stripeId,
+        subscriptionTier: user.subscriptionTier,
         id: user.id
       }
     })

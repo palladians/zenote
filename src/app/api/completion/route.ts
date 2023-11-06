@@ -9,8 +9,12 @@ const openai = new OpenAI({
 
 export const runtime = 'edge'
 
+type ReqBody = {
+  prompt: string
+}
+
 export async function POST(req: Request) {
-  const { prompt } = await req.json()
+  const { prompt } = (await req.json()) as ReqBody
 
   const content = 'Write one paragraph for given prompt: ' + prompt
 

@@ -1,9 +1,9 @@
 import { cn } from '@/lib/utils'
 import Placeholder from '@tiptap/extension-placeholder'
-import { useEditor } from '@tiptap/react'
+import { type Content, useEditor } from '@tiptap/react'
 import { config } from '../notes/editor-config'
 
-export const useFullEditor = ({ defaultValue }: { defaultValue: string }) => {
+export const useFullEditor = ({ defaultValue }: { defaultValue: Content }) => {
   return useEditor({
     autofocus: true,
     extensions: [
