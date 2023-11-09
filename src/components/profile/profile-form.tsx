@@ -25,7 +25,7 @@ export const ProfileForm = ({ user }: { user: UserProps }) => {
   } = useForm<ProfileData>({
     defaultValues: {
       name: user.name ?? '',
-      username: user.username
+      username: user.username ?? ''
     }
   })
   const onSubmit: SubmitHandler<ProfileData> = async (data) => {
