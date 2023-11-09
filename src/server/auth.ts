@@ -11,6 +11,12 @@ import { env } from '@/env.mjs'
 import { db } from '@/server/db'
 import { pgTable, users } from '@/server/db/schema'
 import { eq } from 'drizzle-orm'
+import {
+  adjectives,
+  animals,
+  colors,
+  uniqueNamesGenerator
+} from 'unique-names-generator'
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -41,21 +47,19 @@ declare module 'next-auth' {
  * @see https://next-auth.js.org/configuration/options
  */
 export const authOptions: NextAuthOptions = {
+  events: {
+    async createUser({ user }) {
+      await db
+        .update(users)
+        .set({
+          username: uniqueNamesGenerator({
+            dictionaries: [adjectives, colors, animals]
+          })
+        })
+        .where(eq(users.id, user.id))
+    }
+  },
   callbacks: {
-    async jwt({ user, token }) {
-      const dbUser = await db.query.users.findFirst({
-        where: eq(users.id, user.id)
-      })
-      if (!dbUser) return token
-      return {
-        id: dbUser.id,
-        name: dbUser.name,
-        username: dbUser.username,
-        email: dbUser.email,
-        stripeId: dbUser.stripeId,
-        subscriptionTier: dbUser.subscriptionTier
-      }
-    },
     session: ({ session, user }) => ({
       ...session,
       user: {

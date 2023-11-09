@@ -2,12 +2,15 @@ import { ChannelsList } from '@/components/layout/channels-list'
 import { Button } from '@/components/ui/button'
 import { SidebarTop } from '@/components/layout/sidebar-top'
 import { SidebarUser } from './sidebar-user'
+import { api } from '@/trpc/server'
 
-export const Sidebar = () => {
+export const Sidebar = async () => {
+  const memberships = await api.channels.index.query()
+  const currentUser = await api.users.me.query()
   return (
     <aside className="flex flex-1 flex-col border-r bg-zinc-900">
       <SidebarTop />
-      <ChannelsList />
+      <ChannelsList memberships={memberships} />
       <div className="flex flex-1 flex-col gap-4 p-4">
         <h2 className="text-sm font-semibold">Hashtags</h2>
         <div className="flex flex-col">
@@ -25,7 +28,7 @@ export const Sidebar = () => {
           </Button>
         </div>
       </div>
-      <SidebarUser />
+      <SidebarUser currentUser={currentUser as never} />
     </aside>
   )
 }

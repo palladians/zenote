@@ -18,7 +18,11 @@ export const ProfileForm = ({ user }: { user: UserProps }) => {
   const router = useRouter()
   const { toast } = useToast()
   const { mutateAsync: updateProfile } = api.users.update.useMutation()
-  const { register, handleSubmit } = useForm<ProfileData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { isDirty }
+  } = useForm<ProfileData>({
     defaultValues: {
       name: user.name ?? '',
       username: user.username
@@ -68,7 +72,9 @@ export const ProfileForm = ({ user }: { user: UserProps }) => {
         />
       </fieldset>
       <div>
-        <Button type="submit">Save</Button>
+        <Button type="submit" disabled={!isDirty}>
+          Save
+        </Button>
       </div>
     </form>
   )

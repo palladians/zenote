@@ -6,17 +6,18 @@ import { QuickEditorForm } from '@/components/notes-create/quick-editor-form'
 import { ChannelMenu } from '@/components/channels/channel-menu'
 
 const ChannelPage = async ({ params }: { params: { channelId: string } }) => {
-  const { channel, notes } = await api.channels.get.query({
+  const { channel, notes, role } = await api.channels.get.query({
     id: params.channelId
   })
   if (!channel) return null
+  if (!role) return null
   return (
     <div className="flex flex-1 flex-col">
       <Navbar
         title={
           <div className="flex items-center gap-2">
             <h3 className="font-semibold">{channel.name}</h3>
-            <ChannelMenu channel={channel} hidding={false} />
+            <ChannelMenu channel={channel} role={role} hidding={false} />
           </div>
         }
         addon={

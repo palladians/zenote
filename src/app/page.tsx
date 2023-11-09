@@ -5,8 +5,6 @@ import { redirect } from 'next/navigation'
 
 const SignInPage = async () => {
   const session = await getServerAuthSession()
-  console.log(session?.user)
-  // if (!session?.user.subscriptionTier)
   if (session?.user.email) redirect('/channels')
   return (
     <div className="flex flex-1 items-center justify-center">

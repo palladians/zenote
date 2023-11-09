@@ -1,29 +1,33 @@
 'use client'
 
-import * as React from 'react'
-import { Calendar } from 'lucide-react'
+import { FileIcon } from 'lucide-react'
 
 import {
   CommandDialog,
-  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList
 } from '@/components/ui/command'
-// import { api } from '@/trpc/react'
 import { useAppStore } from '@/store/app'
+import { api } from '@/trpc/react'
+import { debounce } from 'throttle-debounce'
+import { useEffect, useState } from 'react'
+import { getText } from '@/lib/tiptap'
+import { useRouter } from 'next/navigation'
 
 export const NotesSearch = () => {
-  const [query, setQuery] = React.useState<string>('')
-  // const { data } = api.notes.search.useQuery(
-  // { query },
-  // { enabled: query.length > 0 }
-  // )
+  const router = useRouter()
+  const [query, setQuery] = useState<string>('')
+  const { data, refetch } = api.notes.search.useQuery(
+    { query },
+    { enabled: false }
+  )
+  const debouncedRefetch = debounce(1000, refetch)
   const notesSearchOpen = useAppStore((state) => state.notesSearchOpen)
   const setNotesSearchOpen = useAppStore((state) => state.setNotesSearchOpen)
 
-  React.useEffect(() => {
+  useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
@@ -35,6 +39,16 @@ export const NotesSearch = () => {
     return () => document.removeEventListener('keydown', down)
   }, [notesSearchOpen, setNotesSearchOpen])
 
+  useEffect(() => {
+    if (!query) return
+    void debouncedRefetch()
+  }, [query])
+
+  const openNote = (id: string) => {
+    router.push(`/notes/${id}`)
+    setNotesSearchOpen(false)
+  }
+
   return (
     <CommandDialog open={notesSearchOpen} onOpenChange={setNotesSearchOpen}>
       <CommandInput
@@ -43,12 +57,17 @@ export const NotesSearch = () => {
         placeholder="Type a command or search..."
       />
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Results">
-          <CommandItem>
-            <Calendar className="mr-2 h-4 w-4" />
-            <span>Calendar</span>
-          </CommandItem>
+          {data?.map((note, i) => {
+            if (!note.content) return null
+            const excerpt = getText(note.content)
+            return (
+              <CommandItem key={i} onSelect={() => openNote(note.id)}>
+                <FileIcon className="mr-2 h-4 w-4" />
+                <span>{excerpt.substring(0, 40)}</span>
+              </CommandItem>
+            )
+          })}
         </CommandGroup>
       </CommandList>
     </CommandDialog>

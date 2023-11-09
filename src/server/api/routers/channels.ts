@@ -9,16 +9,17 @@ import {
 } from '@/server/db/schema'
 import { and, asc, eq } from 'drizzle-orm'
 import { TRPCError } from '@trpc/server'
+import { omit } from 'rambda'
+import { nanoid } from 'nanoid'
 
 export const channelsRouter = createTRPCRouter({
   index: protectedProcedure.query(async ({ ctx }) => {
-    const memberships = await ctx.db.query.channelMemberships.findMany({
+    return ctx.db.query.channelMemberships.findMany({
       where: eq(channelMemberships.userId, ctx.session.user.id),
       with: {
         channel: true
       }
     })
-    return memberships.map((membership) => membership.channel)
   }),
   get: protectedProcedure
     .input(selectChannelSchema.pick({ id: true }))
@@ -38,7 +39,13 @@ export const channelsRouter = createTRPCRouter({
                     noteBookmarks: true
                   },
                   orderBy: [asc(notes.createdAt)]
-                }
+                },
+                channelMemberships: {
+                  with: {
+                    user: true
+                  }
+                },
+                channelInvitations: true
               }
             }
           }
@@ -46,16 +53,29 @@ export const channelsRouter = createTRPCRouter({
       )
       if (!channelMembership) throw new TRPCError({ code: 'NOT_FOUND' })
       return {
-        channel: channelMembership.channel,
-        notes: channelMembership.channel.notes
+        channel: omit(['notes', 'channelMemberships', 'channelInvitations'])(
+          channelMembership.channel
+        ),
+        notes: channelMembership.channel.notes,
+        channelMemberships:
+          channelMembership.role === 'admin' &&
+          channelMembership.channel.channelMemberships,
+        channelInvitations:
+          channelMembership.role === 'admin' &&
+          channelMembership.channel.channelInvitations,
+        role: channelMembership.role
       }
     }),
   create: protectedProcedure
-    .input(insertChannelSchema)
+    .input(insertChannelSchema.omit({ webhookSecretKey: true }))
     .mutation(async ({ ctx, input }) => {
       const [channel] = await ctx.db
         .insert(channels)
-        .values({ name: input.name, userId: ctx.session.user.id })
+        .values({
+          name: input.name,
+          userId: ctx.session.user.id,
+          webhookSecretKey: nanoid()
+        })
         .returning()
       if (!channel) return
       await ctx.db.insert(channelMemberships).values({

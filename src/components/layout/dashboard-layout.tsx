@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { NoteDeleteDialog } from '@/components/notes/note-delete-dialog'
 import { NoteDueDateDialog } from '@/components/notes/note-due-date-dialog'
 import { ChannelDeleteDialog } from '../channels/channel-delete-dialog'
+import { ChannelLeavingDialog } from '../channels/channel-leaving-dialog'
 
 export const DashboardLayout = async ({
   children
@@ -20,7 +21,8 @@ export const DashboardLayout = async ({
       <NoteDeleteDialog />
       <NoteDueDateDialog />
       <ChannelDeleteDialog />
-      <main className="flex flex-[3]">{children}</main>
+      <ChannelLeavingDialog />
+      <div className="flex flex-[3]">{children}</div>
     </>
   )
 }

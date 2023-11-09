@@ -31,10 +31,12 @@ import { type JSONContent } from '@tiptap/core'
 
 export const NoteRenderer = ({
   note,
-  short = false
+  short = false,
+  showOutlines = false
 }: {
   note: NoteProps
   short?: boolean
+  showOutlines?: boolean
 }) => {
   const router = useRouter()
   const json = useMemo(() => JSON.parse(note.content ?? '{}'), [note.content])
@@ -64,9 +66,8 @@ export const NoteRenderer = ({
   return (
     <Card
       className={cn(
-        'relative flex max-h-[36rem] max-w-[48rem] gap-4 overflow-hidden rounded-xl bg-zinc-900 p-4',
-        isBookmarked && 'border-blue-900',
-        short && 'max-h-[18rem]'
+        'relative flex max-w-[48rem] gap-4 overflow-hidden rounded-xl bg-zinc-900 p-4',
+        showOutlines && isBookmarked && 'border-blue-900'
       )}
     >
       <div className="mt-1">
@@ -75,7 +76,7 @@ export const NoteRenderer = ({
       <div className="flex flex-1 flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4 text-sm">
-            {!short && <p>{note.user?.name}</p>}
+            {!short && <p>{note.user?.name ?? note.user?.username}</p>}
             <NextLink
               href={`/notes/${note.id}`}
               className="text-sm text-muted-foreground"
@@ -135,10 +136,15 @@ export const NoteRenderer = ({
             {!short && <NoteOptions note={note} />}
           </div>
         </div>
-        <div
-          className={cn('prose dark:prose-invert', short && 'prose-sm')}
-          dangerouslySetInnerHTML={{ __html: output }}
-        />
+        <NextLink href={`/notes/${note.id}`}>
+          <div
+            className={cn(
+              'prose max-h-[20rem] overflow-hidden dark:prose-invert',
+              short && 'prose-sm max-h-[12rem]'
+            )}
+            dangerouslySetInnerHTML={{ __html: output }}
+          />
+        </NextLink>
       </div>
       <div className="absolute bottom-0 left-0 right-0 h-[10%] w-full bg-gradient-to-b from-zinc-900/10 to-zinc-900" />
     </Card>

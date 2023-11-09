@@ -12,12 +12,6 @@ import {
 } from 'drizzle-orm/pg-core'
 import { type AdapterAccount } from 'next-auth/adapters'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
-import {
-  adjectives,
-  animals,
-  colors,
-  uniqueNamesGenerator
-} from 'unique-names-generator'
 
 export const pgTable = pgTableCreator((name) => `zenote_${name}`)
 
@@ -53,7 +47,7 @@ export const notes = pgTable('note', {
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   type: text('type', { enum: ['text', 'drawing', 'embed', 'ai'] }).notNull(),
-  content: varchar('content', { length: 1024 }),
+  content: varchar('content', { length: 4096 }),
   locked: boolean('locked').default(false),
   dueDate: timestamp('dueDate'),
   createdAt: timestamp('created_at')
@@ -75,6 +69,7 @@ export const noteBookmarks = pgTable('note_bookmark', {
 export const channels = pgTable('channel', {
   id: uuid('id').primaryKey().unique().defaultRandom(),
   name: varchar('name', { length: 64 }).notNull(),
+  webhookSecretKey: varchar('webhookSecretKey', { length: 32 }).notNull(),
   userId: text('userId')
     .notNull()
     .references(() => users.id),
@@ -89,9 +84,7 @@ export const channelInvitations = pgTable('channel_invitation', {
   channelId: uuid('channelId')
     .notNull()
     .references(() => channels.id, { onDelete: 'cascade' }),
-  userId: text('userId')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
+  invitationEmail: varchar('email', { length: 255 }).notNull(),
   role: varchar('role', { enum: ['member', 'admin'] })
 })
 
@@ -109,12 +102,7 @@ export const channelMemberships = pgTable('channel_membership', {
 export const users = pgTable('user', {
   id: text('id').primaryKey().unique().notNull(),
   name: varchar('name', { length: 255 }),
-  username: varchar('username', { length: 255 })
-    .default(
-      uniqueNamesGenerator({ dictionaries: [adjectives, colors, animals] })
-    )
-    .notNull()
-    .unique(),
+  username: varchar('username', { length: 255 }).unique(),
   stripeId: varchar('stripeId', { length: 255 }),
   subscriptionTier: varchar('subscriptionTier', {
     length: 255,
@@ -192,7 +180,6 @@ export const usersRelations = relations(users, ({ many }) => ({
   comments: many(comments),
   notes: many(notes),
   noteBookmarks: many(noteBookmarks),
-  channelInvitations: many(channelInvitations),
   channelMemberships: many(channelMemberships)
 }))
 
@@ -206,10 +193,6 @@ export const channelsRelations = relations(channels, ({ many, one }) => ({
 export const channelInvitationsRelations = relations(
   channelInvitations,
   ({ one }) => ({
-    user: one(users, {
-      fields: [channelInvitations.userId],
-      references: [users.id]
-    }),
     channel: one(channels, {
       fields: [channelInvitations.channelId],
       references: [channels.id]
@@ -296,3 +279,11 @@ export const insertCommentSchema = createInsertSchema(comments)
 export const selectCommentSchema = createSelectSchema(comments)
 export const insertBookmarkSchema = createInsertSchema(noteBookmarks)
 export const selectBookmarkSchema = createSelectSchema(noteBookmarks)
+export const insertChannelMembershipSchema =
+  createInsertSchema(channelMemberships)
+export const selectChannelMembershipSchema =
+  createSelectSchema(channelMemberships)
+export const insertChannelInvitationSchema =
+  createInsertSchema(channelInvitations)
+export const selectChannelInvitationSchema =
+  createSelectSchema(channelInvitations)

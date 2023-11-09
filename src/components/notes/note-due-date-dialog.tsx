@@ -38,7 +38,10 @@ type DueDateForm = {
 export const NoteDueDateDialog = () => {
   const router = useRouter()
   const dueDateNoteId = useAppStore((state) => state.dueDateNoteId)
-  const { data: note } = api.notes.get.useQuery({ id: dueDateNoteId ?? '' })
+  const { data: note } = api.notes.get.useQuery(
+    { id: dueDateNoteId ?? '' },
+    { enabled: !!dueDateNoteId }
+  )
   const { mutateAsync: updateNote } = api.notes.update.useMutation()
   const setDueDateNoteId = useAppStore((state) => state.setDueDateNoteId)
   const { register, watch, handleSubmit, setValue } = useForm<DueDateForm>({

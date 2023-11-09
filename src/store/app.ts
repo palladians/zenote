@@ -4,6 +4,7 @@ type AppState = {
   extendedEditorOpen: boolean
   editingNoteId: string | null
   deletingChannelId: string | null
+  leavingChannelId: string | null
   deletingNoteId: string | null
   dueDateNoteId: string | null
   noteValue: string
@@ -19,7 +20,8 @@ type AppActions = {
   setDeletingNoteId: (deletingNoteId: AppState['deletingNoteId']) => void
   setDueDateNoteId: (deletingNoteId: AppState['dueDateNoteId']) => void
   setNoteValue: (quickNoteValue: string) => void
-  setNotesSearchOpen: (notesSearchOpen: boolean) => void
+  setNotesSearchOpen: (notesSearchOpen: AppState['notesSearchOpen']) => void
+  setLeavingChannelId: (leavingChannelId: AppState['leavingChannelId']) => void
 }
 
 export type AppStore = AppState & AppActions
@@ -32,6 +34,7 @@ export const useAppStore = create<AppStore>((set) => ({
   noteValue: '',
   notesSearchOpen: false,
   dueDateNoteId: null,
+  leavingChannelId: null,
   setExtendedEditorOpen(open) {
     return set(() => ({ extendedEditorOpen: open }))
   },
@@ -52,5 +55,8 @@ export const useAppStore = create<AppStore>((set) => ({
   },
   setDueDateNoteId(dueDateNoteId) {
     return set(() => ({ dueDateNoteId }))
+  },
+  setLeavingChannelId(leavingChannelId) {
+    return set(() => ({ leavingChannelId }))
   }
 }))

@@ -11,26 +11,29 @@ import { insertChannelSchema } from '@/server/db/schema'
 import NextLink from 'next/link'
 import { type z } from 'zod'
 import { useSession } from 'next-auth/react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { ChannelMenu } from '../channels/channel-menu'
+import { type ChannelMembershipProps } from '@/lib/types'
 
 type CreateChannelFormProps = {
   onBlur: () => void
   onCreated: () => void
 }
 
+const createChannelSchema = insertChannelSchema.omit({ webhookSecretKey: true })
+
 const CreateChannelForm = ({ onBlur, onCreated }: CreateChannelFormProps) => {
   const { mutateAsync: createChannel } = api.channels.create.useMutation()
   const { data } = useSession()
   const { register, handleSubmit } = useForm({
-    resolver: zodResolver(insertChannelSchema),
+    resolver: zodResolver(createChannelSchema),
     defaultValues: {
       name: '',
       userId: data?.user.id ?? ''
     }
   })
-  type CreateChannelData = z.infer<typeof insertChannelSchema>
+  type CreateChannelData = z.infer<typeof createChannelSchema>
   const onSubmit: SubmitHandler<CreateChannelData> = async (data) => {
     await createChannel(data)
     onCreated()
@@ -47,13 +50,17 @@ const CreateChannelForm = ({ onBlur, onCreated }: CreateChannelFormProps) => {
   )
 }
 
-export const ChannelsList = () => {
+export const ChannelsList = ({
+  memberships
+}: {
+  memberships: ChannelMembershipProps[]
+}) => {
+  const router = useRouter()
   const { channelId } = useParams()
   const [creatingChannel, setCreatingChannel] = useState<boolean>(false)
-  const { data: channelList, refetch } = api.channels.index.useQuery()
-  const onCreated = async () => {
+  const onCreated = () => {
     setCreatingChannel(false)
-    await refetch()
+    router.refresh()
   }
   return (
     <>
@@ -74,11 +81,12 @@ export const ChannelsList = () => {
             onCreated={onCreated}
           />
         )}
-        {channelList?.map((channel) => {
-          const active = channel.id === channelId
+        {memberships?.map((membership) => {
+          const active = membership.channel?.id === channelId
+          if (!membership.role) return null
           return (
             <div
-              key={channel.id}
+              key={membership.channel?.id}
               className={cn(
                 'group flex items-center justify-between gap-2 rounded-lg px-2 transition-colors',
                 active && 'bg-zinc-800 text-foreground'
@@ -92,16 +100,21 @@ export const ChannelsList = () => {
                 )}
                 asChild
               >
-                <NextLink href={`/channels/${channel.id}`}>
+                <NextLink href={`/channels/${membership.channel?.id}`}>
                   {active ? (
                     <CircleDotIcon size={16} />
                   ) : (
                     <CircleIcon size={16} />
                   )}
-                  <span>{channel.name}</span>
+                  <span>{membership.channel?.name}</span>
                 </NextLink>
               </Button>
-              <ChannelMenu channel={channel} />
+              {membership.channel && (
+                <ChannelMenu
+                  channel={membership.channel}
+                  role={membership.role}
+                />
+              )}
             </div>
           )
         })}

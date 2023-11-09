@@ -9,7 +9,9 @@ export type NotesListProps = {
 export const NotesList = ({ notes }: NotesListProps) => {
   return (
     <div className="flex flex-col gap-8 py-8">
-      {notes?.map((note) => <NoteRenderer key={note.id} note={note} />)}
+      {notes?.map((note) => (
+        <NoteRenderer key={note.id} note={note} showOutlines />
+      ))}
       <ScrollAnchor />
     </div>
   )
