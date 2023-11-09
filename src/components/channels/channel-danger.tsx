@@ -2,7 +2,7 @@
 
 import { useAppStore } from '@/store/app'
 import { Button } from '../ui/button'
-import { ChannelProps } from '@/lib/types'
+import { type ChannelProps } from '@/lib/types'
 
 export const ChannelDanger = ({ channel }: { channel: ChannelProps }) => {
   const setDeletingChannelId = useAppStore(

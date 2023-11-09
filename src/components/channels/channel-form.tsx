@@ -1,7 +1,7 @@
 'use client'
 
-import { ChannelProps } from '@/lib/types'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { type ChannelProps } from '@/lib/types'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'

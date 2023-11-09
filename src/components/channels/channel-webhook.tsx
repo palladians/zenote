@@ -1,6 +1,6 @@
 'use client'
 
-import { ChannelProps } from '@/lib/types'
+import { type ChannelProps } from '@/lib/types'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Button } from '../ui/button'
