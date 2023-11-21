@@ -4,23 +4,16 @@ import '@/components/notes/editor.css'
 import { type Editor, EditorContent } from '@tiptap/react'
 import { cn } from '@/lib/utils'
 import { EditorBubbleMenu } from '@/components/notes/editor-bubble-menu'
-import { debounce } from 'throttle-debounce'
-import { useEffect } from 'react'
+import { type NoteProps } from '@/lib/types'
 
 export type OnSaveHandler = ({ content }: { content: string }) => Promise<void>
 
 export type EditorCoreProps = {
   editor: Editor
-  onSave: OnSaveHandler
+  note: NoteProps
 }
 
-export const FullEditor = ({ editor, onSave }: EditorCoreProps) => {
-  const debouncedOnSave = debounce(1000, onSave)
-  const content = editor?.state.doc.content
-  useEffect(() => {
-    if (!editor) return
-    void debouncedOnSave({ content: JSON.stringify(editor?.getJSON()) })
-  }, [content, debouncedOnSave, editor])
+export const FullEditor = ({ editor }: EditorCoreProps) => {
   if (!editor) return null
   return (
     <>

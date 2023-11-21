@@ -4,7 +4,10 @@ import { insertUserSchema, users } from '@/server/db/schema'
 
 export const usersRouter = createTRPCRouter({
   me: protectedProcedure.query(({ ctx }) =>
-    ctx.db.query.users.findFirst({ where: eq(users.id, ctx.session.user.id) })
+    ctx.db.query.users.findFirst({
+      where: eq(users.id, ctx.session.user.id),
+      with: { hashtags: true }
+    })
   ),
   update: protectedProcedure
     .input(insertUserSchema.omit({ id: true }))

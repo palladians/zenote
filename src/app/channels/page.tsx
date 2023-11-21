@@ -46,7 +46,7 @@ const HomePage = async () => {
               </div>
             </div>
           ) : (
-            <Card className="flex items-center gap-2 p-4">
+            <Card className="flex items-center gap-2 bg-zinc-900 p-4">
               <span>
                 Start using FlowBox by setting a due date of a note with
               </span>
@@ -71,7 +71,7 @@ const HomePage = async () => {
               </div>
             </div>
           ) : (
-            <Card className="flex items-center gap-2 p-4">
+            <Card className="flex items-center gap-2 bg-zinc-900 p-4">
               <span>Bookmark notes with</span>
               <StarIcon size={20} />
               <span>button to display them here.</span>

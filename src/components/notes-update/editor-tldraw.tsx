@@ -10,7 +10,7 @@ import {
 } from '@tldraw/tldraw'
 import '@tldraw/tldraw/tldraw.css'
 import { useEffect, useState } from 'react'
-import { debounce } from 'throttle-debounce'
+import debounceFunction from 'debounce-fn'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 
 declare module '@tiptap/core' {
@@ -32,7 +32,7 @@ const DrawingComponent = track(({ updateAttributes, node }: NodeViewProps) => {
       state: JSON.stringify(snapshot)
     })
   }
-  const debouncedCanvasUpdate = debounce(1000, onCanvasUpdate)
+  const debouncedCanvasUpdate = debounceFunction(onCanvasUpdate, { wait: 1000 })
   useEffect(() => {
     if (!store) return
     store.listen(debouncedCanvasUpdate)

@@ -28,6 +28,7 @@ import { type NoteProps } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { useAppStore } from '@/store/app'
 import { type JSONContent } from '@tiptap/core'
+import { NoteContentRenderer } from '../notes/note-content-renderer'
 
 export const NoteRenderer = ({
   note,
@@ -39,11 +40,6 @@ export const NoteRenderer = ({
   showOutlines?: boolean
 }) => {
   const router = useRouter()
-  const json = useMemo(() => JSON.parse(note.content ?? '{}'), [note.content])
-  const output = useMemo(
-    () => generateHTML(json as JSONContent, config.extensions),
-    [json]
-  )
   const setDueDateNoteId = useAppStore((state) => state.setDueDateNoteId)
   const { data } = useSession()
   const { mutateAsync: toggleBookmark } = api.bookmarks.toggle.useMutation()
@@ -137,13 +133,11 @@ export const NoteRenderer = ({
           </div>
         </div>
         <NextLink href={`/notes/${note.id}`}>
-          <div
-            className={cn(
-              'prose max-h-[20rem] overflow-hidden dark:prose-invert',
-              short && 'prose-sm max-h-[12rem]'
-            )}
-            dangerouslySetInnerHTML={{ __html: output }}
-          />
+          {note.content && (
+            <div className={cn('max-h-[20rem]', short && 'max-h-[12rem]')}>
+              <NoteContentRenderer content={note.content} />
+            </div>
+          )}
         </NextLink>
       </div>
       <div className="absolute bottom-0 left-0 right-0 h-[10%] w-full bg-gradient-to-b from-zinc-900/10 to-zinc-900" />

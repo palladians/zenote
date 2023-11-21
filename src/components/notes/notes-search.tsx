@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/command'
 import { useAppStore } from '@/store/app'
 import { api } from '@/trpc/react'
-import { debounce } from 'throttle-debounce'
+import debounceFunction from 'debounce-fn'
 import { useEffect, useState } from 'react'
 import { getText } from '@/lib/tiptap'
 import { useRouter } from 'next/navigation'
@@ -23,7 +23,7 @@ export const NotesSearch = () => {
     { query },
     { enabled: false }
   )
-  const debouncedRefetch = debounce(1000, refetch)
+  const debouncedRefetch = debounceFunction(refetch, { wait: 1000 })
   const notesSearchOpen = useAppStore((state) => state.notesSearchOpen)
   const setNotesSearchOpen = useAppStore((state) => state.setNotesSearchOpen)
 
@@ -46,6 +46,7 @@ export const NotesSearch = () => {
 
   const openNote = (id: string) => {
     router.push(`/notes/${id}`)
+    router.refresh()
     setNotesSearchOpen(false)
   }
 
@@ -64,7 +65,7 @@ export const NotesSearch = () => {
             return (
               <CommandItem key={i} onSelect={() => openNote(note.id)}>
                 <FileIcon className="mr-2 h-4 w-4" />
-                <span>{excerpt.substring(0, 40)}</span>
+                <span>{excerpt.substring(0, 64)}</span>
               </CommandItem>
             )
           })}

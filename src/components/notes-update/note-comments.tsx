@@ -100,7 +100,7 @@ const CommentList = ({ note }: { note: NoteProps }) => {
           content={comment.content ?? ''}
           createdAt={comment.createdAt}
           id={comment.id ?? ''}
-          userName={comment.user?.name ?? ''}
+          userName={comment.user?.name ?? comment.user?.username ?? ''}
         />
       ))}
       {addingComment ? (

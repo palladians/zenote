@@ -4,6 +4,8 @@ import { api } from '@/trpc/server'
 import { NotesList } from '@/components/channels/notes-list'
 import { QuickEditorForm } from '@/components/notes-create/quick-editor-form'
 import { ChannelMenu } from '@/components/channels/channel-menu'
+import { MonitorPlayIcon } from 'lucide-react'
+import NextLink from 'next/link'
 
 const ChannelPage = async ({ params }: { params: { channelId: string } }) => {
   const { channel, notes, role } = await api.channels.get.query({
@@ -21,9 +23,16 @@ const ChannelPage = async ({ params }: { params: { channelId: string } }) => {
           </div>
         }
         addon={
-          <Button size="sm" variant="secondary">
-            Share
-          </Button>
+          <div className="flex gap-2">
+            <Button size="sm" variant="secondary" asChild>
+              <NextLink href={`/present/${channel.id}`}>
+                <MonitorPlayIcon size={16} />
+              </NextLink>
+            </Button>
+            <Button size="sm" variant="secondary">
+              Share
+            </Button>
+          </div>
         }
       />
       <div className="container flex flex-1 flex-col overflow-y-auto">

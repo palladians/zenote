@@ -8,7 +8,8 @@ import {
   text,
   timestamp,
   varchar,
-  boolean
+  boolean,
+  unique
 } from 'drizzle-orm/pg-core'
 import { type AdapterAccount } from 'next-auth/adapters'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
@@ -30,13 +31,19 @@ export const comments = pgTable('comment', {
   updatedAt: timestamp('updatedAt').defaultNow()
 })
 
-export const hashtags = pgTable('hashtag', {
-  id: uuid('id').primaryKey().unique().defaultRandom(),
-  userId: text('userId')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  name: varchar('name', { length: 64 }).notNull()
-})
+export const hashtags = pgTable(
+  'hashtag',
+  {
+    id: uuid('id').primaryKey().unique().defaultRandom(),
+    userId: text('userId')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    name: varchar('name', { length: 64 }).notNull()
+  },
+  (t) => ({
+    unq: unique().on(t.name, t.userId)
+  })
+)
 
 export const notes = pgTable('note', {
   id: uuid('id').primaryKey().unique().defaultRandom(),
@@ -180,7 +187,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   comments: many(comments),
   notes: many(notes),
   noteBookmarks: many(noteBookmarks),
-  channelMemberships: many(channelMemberships)
+  channelMemberships: many(channelMemberships),
+  hashtags: many(hashtags)
 }))
 
 export const channelsRelations = relations(channels, ({ many, one }) => ({
@@ -235,10 +243,10 @@ export const notesToHashtags = pgTable(
   {
     noteId: uuid('noteId')
       .notNull()
-      .references(() => notes.id),
+      .references(() => notes.id, { onDelete: 'cascade' }),
     hashtagId: uuid('hashtagId')
       .notNull()
-      .references(() => hashtags.id)
+      .references(() => hashtags.id, { onDelete: 'cascade' })
   },
   (t) => ({
     pk: primaryKey(t.noteId, t.hashtagId)
@@ -273,6 +281,8 @@ export const insertUserSchema = createInsertSchema(users)
 export const selectUserSchema = createSelectSchema(users)
 export const insertChannelSchema = createInsertSchema(channels)
 export const selectChannelSchema = createSelectSchema(channels)
+export const insertHashtagSchema = createInsertSchema(hashtags)
+export const selectHashtagSchema = createSelectSchema(hashtags)
 export const insertNoteSchema = createInsertSchema(notes)
 export const selectNoteSchema = createSelectSchema(notes)
 export const insertCommentSchema = createInsertSchema(comments)

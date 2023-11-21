@@ -1,14 +1,20 @@
 import {
   channelMemberships,
+  hashtags,
   insertNoteSchema,
   noteBookmarks,
   notes,
+  notesToHashtags,
   selectNoteSchema
 } from '@/server/db/schema'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 import { and, eq, ilike, inArray, isNotNull } from 'drizzle-orm'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+import { omit } from 'rambda'
+import { type HashtagProps } from '@/lib/types'
+
+const HASHTAG_REGEX = /#\w+/g
 
 export const notesRouter = createTRPCRouter({
   index: protectedProcedure.query(({ ctx }) =>
@@ -19,6 +25,33 @@ export const notesRouter = createTRPCRouter({
       )
     })
   ),
+  byHashtag: protectedProcedure
+    .input(z.object({ hashtagName: z.string().min(1) }))
+    .query(async ({ ctx, input }) => {
+      const matchingHashtag = await ctx.db.query.hashtags.findFirst({
+        where: and(
+          eq(hashtags.name, input.hashtagName),
+          eq(hashtags.userId, ctx.session.user.id)
+        ),
+        with: {
+          notesToHashtags: {
+            with: {
+              note: {
+                with: {
+                  user: true
+                }
+              }
+            }
+          }
+        }
+      })
+      return {
+        notes: matchingHashtag?.notesToHashtags.map(
+          (noteToHashtag) => noteToHashtag.note
+        ),
+        hashtag: omit(['notesToHashtags'], matchingHashtag) as HashtagProps
+      }
+    }),
   search: protectedProcedure
     .input(z.object({ query: z.string().min(1) }))
     .query(async ({ ctx, input }) => {
@@ -76,7 +109,26 @@ export const notesRouter = createTRPCRouter({
         )
       })
       if (!membership) throw new TRPCError({ code: 'FORBIDDEN' })
-      return ctx.db
+      const parsedHashtags =
+        input.content
+          ?.match(HASHTAG_REGEX)
+          ?.map((hashtag) => hashtag.split('#')[1] ?? '') ?? []
+      const hashtagsPayloads =
+        parsedHashtags.length > 0
+          ? parsedHashtags.map((hashtag) => ({
+              userId: ctx.session.user.id,
+              name: hashtag
+            }))
+          : []
+      const contentHashtags =
+        hashtagsPayloads.length > 0
+          ? await ctx.db
+              .insert(hashtags)
+              .values(hashtagsPayloads)
+              .onConflictDoNothing()
+              .returning()
+          : []
+      const [note] = await ctx.db
         .insert(notes)
         .values({
           content: input.content ?? '{}',
@@ -85,6 +137,16 @@ export const notesRouter = createTRPCRouter({
           userId: ctx.session.user.id
         })
         .returning()
+      const hashtagsToNote = contentHashtags.map((hashtag) => ({
+        noteId: note?.id ?? '',
+        hashtagId: hashtag.id
+      }))
+      if (hashtagsToNote.length > 0)
+        await ctx.db
+          .insert(notesToHashtags)
+          .values(hashtagsToNote)
+          .onConflictDoNothing()
+      return note
     }),
   update: protectedProcedure
     .input(insertNoteSchema.extend({ id: z.string().min(1) }))
@@ -96,7 +158,26 @@ export const notesRouter = createTRPCRouter({
         )
       })
       if (!membership) throw new TRPCError({ code: 'FORBIDDEN' })
-      return ctx.db
+      const parsedHashtags =
+        input.content
+          ?.match(HASHTAG_REGEX)
+          ?.map((hashtag) => hashtag.split('#')[1] ?? '') ?? []
+      const hashtagsPayloads =
+        parsedHashtags.length > 0
+          ? parsedHashtags.map((hashtag) => ({
+              userId: ctx.session.user.id,
+              name: hashtag
+            }))
+          : []
+      const contentHashtags =
+        hashtagsPayloads.length > 0
+          ? await ctx.db
+              .insert(hashtags)
+              .values(hashtagsPayloads)
+              .onConflictDoNothing()
+              .returning()
+          : []
+      const [note] = await ctx.db
         .update(notes)
         .set({
           content: input.content,
@@ -109,6 +190,16 @@ export const notesRouter = createTRPCRouter({
           and(eq(notes.id, input.id), eq(notes.channelId, input.channelId))
         )
         .returning()
+      const hashtagsToNote = contentHashtags.map((hashtag) => ({
+        noteId: note?.id ?? '',
+        hashtagId: hashtag.id
+      }))
+      if (hashtagsToNote.length > 0)
+        await ctx.db
+          .insert(notesToHashtags)
+          .values(hashtagsToNote)
+          .onConflictDoNothing()
+      return note
     }),
   delete: protectedProcedure
     .input(selectNoteSchema.pick({ id: true }))

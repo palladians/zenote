@@ -10,6 +10,7 @@ import {
   ClockIcon,
   FileIcon,
   MessageSquareIcon,
+  MonitorPlayIcon,
   PlusIcon,
   StarIcon,
   StarOffIcon
@@ -27,6 +28,7 @@ import { useAppStore } from '@/store/app'
 import { api } from '@/trpc/react'
 import { useSession } from 'next-auth/react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
+import NextLink from 'next/link'
 
 export const NoteMenu = ({
   editor,
@@ -88,7 +90,7 @@ export const NoteMenu = ({
           <TooltipContent>Files</TooltipContent>
         </Tooltip>
       </div>
-      <div className="flex">
+      <div className="flex items-center">
         {isBookmarked ? (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -108,6 +110,18 @@ export const NoteMenu = ({
             <TooltipContent>Bookmark</TooltipContent>
           </Tooltip>
         )}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" asChild>
+              <NextLink
+                href={`/present/${note.channelId}?current_slide=${note.id}`}
+              >
+                <MonitorPlayIcon size={16} />
+              </NextLink>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Present</TooltipContent>
+        </Tooltip>
         {note.dueDate ? (
           <Tooltip>
             <TooltipTrigger asChild>

@@ -32,7 +32,7 @@ export const QuickEditorForm = ({ saveCallback }: EditorFormProps) => {
       channelId: String(channelId)
     })
     router.refresh()
-    router.push(`/notes/${note[0]?.id}`)
+    router.push(`/notes/${note?.id}`)
   }
   return (
     <div className="z-10 flex items-center gap-2">

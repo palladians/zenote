@@ -12,13 +12,17 @@ import {
   type insertChannelMembershipSchema,
   type selectChannelMembershipSchema,
   type insertChannelInvitationSchema,
-  type selectChannelInvitationSchema
+  type selectChannelInvitationSchema,
+  type insertHashtagSchema,
+  type selectHashtagSchema
 } from '@/server/db/schema'
 import { type z } from 'zod'
 
 export type UserProps = z.infer<
   typeof insertUserSchema & typeof selectUserSchema
->
+> & {
+  hashtags?: HashtagProps[]
+}
 export type ChannelMembershipProps = z.infer<
   typeof insertChannelMembershipSchema & typeof selectChannelMembershipSchema
 > & {
@@ -36,6 +40,9 @@ export type ChannelProps = z.infer<
   channelMemberships?: ChannelMembershipProps[]
   channelInvitations?: ChannelInvitationProps[]
 }
+export type HashtagProps = z.infer<
+  typeof insertHashtagSchema & typeof selectHashtagSchema
+>
 export type NoteBookmarkProps = z.infer<
   typeof insertBookmarkSchema & typeof selectBookmarkSchema
 >

@@ -9,15 +9,32 @@ import {
   DropdownMenuTrigger
 } from '../ui/dropdown-menu'
 import { Button } from '../ui/button'
-import { LockIcon, MoreVerticalIcon, ShareIcon, TrashIcon } from 'lucide-react'
+import {
+  LockIcon,
+  MoreVerticalIcon,
+  ShareIcon,
+  TrashIcon,
+  UnlockIcon
+} from 'lucide-react'
 import { useAppStore } from '@/store/app'
+import { useRouter } from 'next/navigation'
+import { api } from '@/trpc/react'
 
 export type NoteOptionsProps = {
   note: NoteProps
 }
 
 export const NoteOptions = ({ note }: NoteOptionsProps) => {
+  const router = useRouter()
   const setDeletingNoteId = useAppStore((state) => state.setDeletingNoteId)
+  const { mutateAsync: updateNote } = api.notes.update.useMutation()
+  const toggleNoteLock = async () => {
+    await updateNote({
+      ...note,
+      locked: !note.locked
+    })
+    router.refresh()
+  }
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -26,9 +43,9 @@ export const NoteOptions = ({ note }: NoteOptionsProps) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem className="gap-2">
-          <LockIcon size={16} />
-          <span>Lock</span>
+        <DropdownMenuItem className="gap-2" onClick={toggleNoteLock}>
+          {note.locked ? <UnlockIcon size={16} /> : <LockIcon size={16} />}
+          <span>{note.locked ? 'Unlock' : 'Lock'}</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="gap-2">
           <ShareIcon size={16} />
